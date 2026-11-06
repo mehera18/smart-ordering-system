@@ -1,0 +1,49 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            # ── Auth Service ──────────────────────────────────────────────────
+            - id: auth-service
+              uri: lb://AUTH-SERVICE
+              predicates:
+                - Path=/api/users/**
+               # strips /auth → forwards bare path to service
+
+            # ── Product Service ───────────────────────────────────────────────
+            - id: product-service
+              uri: lb://PRODUCT-SERVICE
+              predicates:
+                - Path=/api/products/**
+                 # strips /products → forwards bare path to service
+
+            # ── Order Service ─────────────────────────────────────────────────
+            - id: order-service
+              uri: lb://ORDER-SERVICE
+              predicates:
+                - Path=/api/orders/**
+                  # routes /api/orders/** requests to ORDER-SERVICE via Eureka
+              filters:
+                  - AddRequestHeader=X-Gateway-Auth, true
+
+
+# ── Eureka Client ────────────────────────────────────────────────────────────
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+
+# ── Logging ──────────────────────────────────────────────────────────────────
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
