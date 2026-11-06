@@ -1,0 +1,17 @@
+package com.example.order_service.dao;
+
+import com.example.order_service.entity.Order;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface OrderDao {
+
+    Order save(Order order);
+
+    Optional<Order> findById(Long id);
+
+    List<Order> findAll();
+
+    void deleteById(Long id);
+}
